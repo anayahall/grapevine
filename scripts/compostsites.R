@@ -5,8 +5,8 @@ library(maps)
 library(mapdata)
 library(tidyverse)
 
-setwd("/Users/anayahall/Box Sync/RESEARCH/NRT Poster")
-comp_sites <- read_csv("compostsites.csv", skip=1,
+setwd("/Users/anayahall/projects/grapevine")
+comp_sites <- read_csv("data/compostsites.csv", skip=1,
                        col_names = c("name", "id", "type", "status", "address", "city", "lat", "long"))
 
 
@@ -15,11 +15,11 @@ open_sites <- subset(comp_sites, status != "OPEN - CLOSED/WITH MONITORING" & nam
 states <- map_data("state")
 ca_df <- subset(states, region =="california")  
 
-png("compost_plot.png", width = 3000, height = 4000, bg = NA)
+png("plots/compost_plot.png", width = 3000, height = 4000, bg = NA)
 
 ca_base <- ggplot(data = ca_df, mapping = aes(x = long, y = lat)) + 
   coord_fixed(1.3) + 
-  geom_polygon(color = NA, fill = NA) + 
+  geom_polygon(color = "blue", fill = "white") + 
   geom_point(data = open_sites, mapping = aes(x = long, y = lat), color = "orange1", size = 15) +
   theme_void()
 
@@ -29,6 +29,6 @@ ca_base
 dev.off()
 
 
-
-dev.copy(png,'myplot.png')
-dev.off()
+# 
+# dev.copy(png,'myplot.png')
+# dev.off()
