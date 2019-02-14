@@ -18,8 +18,9 @@ setwd("/Users/anayahall/projects/grapevine")
 
 # grab state maps for plotting later
 states <- map_data("state")
+counties <- map_data(map = "county", region = "california") #, region == "california")
 # just want CA
-ca_df <- subset(states, region =="california")  
+CA <- subset(states, region =="california")  
 
 ###############################################################################################################
 
@@ -93,9 +94,10 @@ write_csv(CR_sites, "data/CR_compostFacilities.csv")
 
 png("plots/compost_comparison.png", width = 1000, height = 1200, units = "px")
 
-g <- ggplot(data = ca_df, mapping = aes(x = long, y = lat)) + 
+g <- ggplot(data = CA, mapping = aes(x = long, y = lat)) + 
   coord_fixed(1.3) + 
   geom_polygon(color = "black", fill = "white") + 
+ #  geom_polygon(data = counties, aes(fill=region), color = "grey", fill = "white") +
   geom_point(data = open_sites, mapping = aes(x = long, y = lat), color = "orange1", size = 5, alpha=.5) +
   geom_point(data = epa_sites_geo, aes(x=lon, y=lat), color = "blue", size = 5, alpha=.5) +
   geom_point(data = CR_sites, aes(x = Longitude, y = Latitude), color = "green", size = 5, alpha=.5) +
