@@ -12,6 +12,13 @@ library(maps)
 library(mapdata)
 library(tidyverse)
 library(dplyr)
+library(raster)
+library(maptools)
+library(reshape)
+library(ncdf4)
+library(rgeos)
+library(sp)
+library(rgdal)
 
 #set project wd
 setwd("/Users/anayahall/projects/grapevine")
@@ -91,25 +98,38 @@ write_csv(CR_sites, "data/CR_compostFacilities.csv")
 
 ################## CLEAN CAPACITY UNITS!!!!!
 
-# subset out stuff measured in tons - convert to cu yards
-# 1 ton = 2.24 cu yards compost
-
-CR_sites %>% filter(str_detect(CapacityUnits, "day")) %>% mutate(Capacity = Capacity * 365) %>% rbind(CR_sites)
-
-
-ton_sub <- CR_sites %>% filter(str_detect(CapacityUnits, "Tons")) %>% 
-  mutate(Capacity = (Capacity * 2.24), CapacityUnits = "Cubic Yards")
-
-rest <- CR_sites %>% filter(str_detect(CapacityUnits, "Yards"))
-bm_cap_B <- sum(rest$Capacity)
-bm_cap_A <- sum(ton_sub$Capacity)
-bm_cap <- bm_cap_A + bm_cap_B # cubic yards
-
-bm_cap / 2.24
+# # subset out stuff measured in tons - convert to cu yards
+# # 1 ton = 2.24 cu yards compost
+# 
+# CR_sites %>% filter(str_detect(CapacityUnits, "day")) %>% mutate(Capacity = Capacity * 365) %>% rbind(CR_sites)
+# 
+# 
+# ton_sub <- CR_sites %>% filter(str_detect(CapacityUnits, "Tons")) %>% 
+#   mutate(Capacity = (Capacity * 2.24), CapacityUnits = "Cubic Yards")
+# 
+# rest <- CR_sites %>% filter(str_detect(CapacityUnits, "Yards"))
+# bm_cap_B <- sum(rest$Capacity)
+# bm_cap_A <- sum(ton_sub$Capacity)
+# bm_cap <- bm_cap_A + bm_cap_B # cubic yards
+# 
+# bm_cap / 2.24
 
 ###############################################################################################################
 # ALSO - Check against compost/active list (which has 182 entries, but no capacity units) - 
 # join with larger SWIS databses and change UNITS to be consistent
+
+
+###############################################################################################################
+
+
+coordinates(pts)=~x+y
+
+
+# Convert to your regular km system by first telling it what CRS it is, and then spTransform to the destination.
+
+proj4string(pts)=CRS("+init=epsg:4326") # set it to lat-long
+pts = spTransform(pts,CRS("insert your proj4 string here"))
+
 
 ###############################################################################################################
 # Plot and compare data sources
