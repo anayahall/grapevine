@@ -2,9 +2,10 @@
 # Anaya Hall
 # this script loads and cleans data files containing composting facilities in California
 
-# Origninally created for nrt poster using waterboard data (compostsites.csv) - September 2018
+# Origninally created for nrt poster using Waterboard data (compostsites.csv) - September 2018
 # February 2019 -- amended to utilize EPA Region 9 composting facilities from ExcessFoodMap
 
+rm(list = ls())
 # load libraries
 library(ggplot2)
 library(ggmap)
@@ -29,47 +30,51 @@ counties <- map_data(map = "county", region = "california") #, region == "califo
 # just want CA
 CA <- subset(states, region =="california")  
 
+# ###############################################################################################################
+# WaterBoard Data - old
 ###############################################################################################################
-
-# load original data
-comp_sites <- read_csv("data/compostsites.csv", skip=1,
-                       col_names = c("name", "id", "type", "status", "address", "city", "lat", "long"))
-
-# filter to only open/active 
-open_sites <- subset(comp_sites, status != "OPEN - CLOSED/WITH MONITORING")
-
-###############################################################################################################
-
-
-# Load EPA DATA (EXCESSFOODMAP) 
-allFacilities <- readxl::read_excel('data/EXCESSFOODPUBLIC_USTER_2015_R9.GDB/ExcelTables/Composting Facilities.xlsx', 
-                                    sheet = 2)
-CAfacilities <- allFacilities %>% filter(State == "CA")
-
-# Need to GEOCODE
-#https://www.r-bloggers.com/batch-geocoding-with-r-and-google-maps/
-
-# FIRST Register w Google maps and set up API Key
-  # devtools::install_github("dkahle/ggmap")
-  # register_google("AIzaSyDMg1LIYzqPk8sAZD0OKqMTBjhZmlEzLig")
-  # ggmap_credentials()
-
-# street_addresses <- CAfacilities$Address
-# cities <- CAfacilities$City
 # 
-# full_addresses <- paste0(street_addresses, ", ", cities)
+# # load first run of data from CA waterboard
+# comp_sites <- read_csv("data/WB_compostsites.csv", skip=1,
+#                        col_names = c("name", "id", "type", "status", "address", "city", "lat", "long"))
 # 
-# # get lat long and bind to df
-# epa_sites_geo <- cbind(CAfacilities, geocode(full_addresses))
-
-#save as separate csv for late
-#write_csv(epa_sites_geo, "data/epa_facilities_geocoded.csv")
-
-epa_sites_geo <- read_csv("data/epa_facilities_geocoded.csv")
+# # filter to only open/active 
+# open_sites <- subset(comp_sites, status != "OPEN - CLOSED/WITH MONITORING")
+# ###############################################################################################################
+# EPA Excess FoodMap Data (old)
+###############################################################################################################
+# 
+# 
+# # Load EPA DATA (EXCESSFOODMAP) 
+# allFacilities <- readxl::read_excel('data/EXCESSFOODPUBLIC_USTER_2015_R9.GDB/ExcelTables/Composting Facilities.xlsx', 
+#                                     sheet = 2)
+# CAfacilities <- allFacilities %>% filter(State == "CA")
+# 
+# # Need to GEOCODE
+# #https://www.r-bloggers.com/batch-geocoding-with-r-and-google-maps/
+# 
+# # FIRST Register w Google maps and set up API Key
+#   # devtools::install_github("dkahle/ggmap")
+#   # register_google("AIzaSyDMg1LIYzqPk8sAZD0OKqMTBjhZmlEzLig")
+#   # ggmap_credentials()
+# 
+# # street_addresses <- CAfacilities$Address
+# # cities <- CAfacilities$City
+# # 
+# # full_addresses <- paste0(street_addresses, ", ", cities)
+# # 
+# # # get lat long and bind to df
+# # epa_sites_geo <- cbind(CAfacilities, geocode(full_addresses))
+# 
+# #save as separate csv for late
+# #write_csv(epa_sites_geo, "data/epa_facilities_geocoded.csv")
+# 
+# epa_sites_geo <- read_csv("data/epa_facilities_geocoded.csv")
 
 ###############################################################################################################
-# CalRecycle's SWIS Inventory
+# CalRecycle's SWIS Inventory  ** Preferred source! 
 # This dataset is already geotagged and also contains information on CAPACITY
+
 
 library(readxl)    
 
@@ -86,15 +91,33 @@ read_excel_allsheets <- function(filename, tibble = FALSE) {
 }
 
 #load all three sheets of Cal Recycle's SWIS dataset
-swis <- read_excel_allsheets("data/SWIS.xls")
+swis_raw <- read_excel_allsheets("data/SWIS.xls")
 
 # Join
-swis_comp <- inner_join(x= swis$Site, y = swis$Unit)
+swis_joined <- inner_join(x= swis_raw$Site, y = swis_raw$Unit)
 
-#filter to composting
-CR_sites <- swis_comp %>% filter(str_detect(Activity, "Compost") & OperationalStatus == "Active")
+# keep only needed vars
+swis_clean <- swis_joined %>% select(SwisNo, Name, County, Location, Place, Latitude, Longitude, 
+                                     Category, Activity, OperationalStatus, AcceptedWaste, Throughput, 
+                                     ThroughputUnits, Capacity, CapacityUnits, Acreage, RemainingCapacity)
+#save as csv
+write_csv(swis_clean, "data/swis_clean.csv")
 
-write_csv(CR_sites, "data/CR_compostFacilities.csv")
+#filter out closed sites
+
+swis_open <- swis_clean %>% filter(OperationalStatus != "Closed")
+
+#filter to composting (may come back to this to select all other sites as well)
+comp_sites <- swis_clean %>% filter(str_detect(Activity, "Compost") & OperationalStatus == "Active")
+
+write_csv(comp_sites, "data/swis_active_compost.csv")
+
+#alternate download from swis database: CompostActive_FacilityDirectory-- is this different???
+comp_act_dir <- read_excel("data/CompostActive_FacilityDirectory.xlsx")
+names(comp_act_dir)[1] <- "SwisNo"
+co_list <- unique(comp_act_dir$SwisNo)
+
+swis_open2 <- swis_clean %>% filter(SwisNo %in% co_list)
 
 ################## CLEAN CAPACITY UNITS!!!!!
 
@@ -122,13 +145,13 @@ write_csv(CR_sites, "data/CR_compostFacilities.csv")
 ###############################################################################################################
 
 
-coordinates(pts)=~x+y
+coordinates(swis)=~x+y
 
 
 # Convert to your regular km system by first telling it what CRS it is, and then spTransform to the destination.
 
-proj4string(pts)=CRS("+init=epsg:4326") # set it to lat-long
-pts = spTransform(pts,CRS("insert your proj4 string here"))
+proj4string(swis)=CRS("+init=epsg:4326") # set it to lat-long
+swis = spTransform(swis,CRS("+proj=aea +lat_1=33.11213321093334 +lat_2=40.89742770321884 +lon_0=-119.59716796875"))
 
 
 ###############################################################################################################
