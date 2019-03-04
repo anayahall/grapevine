@@ -3,7 +3,8 @@
 # this script loads and cleans data files containing composting facilities in California
 
 # Origninally created for nrt poster using Waterboard data (compostsites.csv) - September 2018
-# February 2019 -- amended to utilize EPA Region 9 composting facilities from ExcessFoodMap
+# February 2019 -- amended to utilize EPA Region 9 composting facilities from ExcessFoodMap 
+# and CalRecycle's Solid Waste Inventory Data <- preferred data source
 
 rm(list = ls())
 # load libraries
@@ -75,7 +76,6 @@ CA <- subset(states, region =="california")
 # CalRecycle's SWIS Inventory  ** Preferred source! 
 # This dataset is already geotagged and also contains information on CAPACITY
 
-
 library(readxl)    
 
 #function to load all sheets
@@ -103,55 +103,59 @@ swis_clean <- swis_joined %>% select(SwisNo, Name, County, Location, Place, Lati
 #save as csv
 write_csv(swis_clean, "data/swis_clean.csv")
 
-#filter out closed sites
-
-swis_open <- swis_clean %>% filter(OperationalStatus != "Closed")
-
 #filter to composting (may come back to this to select all other sites as well)
-comp_sites <- swis_clean %>% filter(str_detect(Activity, "Compost") & OperationalStatus == "Active")
+comp_swis <- swis_clean %>% filter(str_detect(Activity, "Compost") | str_detect(Activity, "Chip") & OperationalStatus != "Closed")
+#comp_sites <- swis_clean %>% filter(str_detect(Category, "Compost") & OperationalStatus == "Active")
 
-write_csv(comp_sites, "data/swis_active_compost.csv")
-
-#alternate download from swis database: CompostActive_FacilityDirectory-- is this different???
-comp_act_dir <- read_excel("data/CompostActive_FacilityDirectory.xlsx")
-names(comp_act_dir)[1] <- "SwisNo"
-co_list <- unique(comp_act_dir$SwisNo)
-
-swis_open2 <- swis_clean %>% filter(SwisNo %in% co_list)
-
-################## CLEAN CAPACITY UNITS!!!!!
-
-# # subset out stuff measured in tons - convert to cu yards
-# # 1 ton = 2.24 cu yards compost
-# 
-# CR_sites %>% filter(str_detect(CapacityUnits, "day")) %>% mutate(Capacity = Capacity * 365) %>% rbind(CR_sites)
-# 
-# 
-# ton_sub <- CR_sites %>% filter(str_detect(CapacityUnits, "Tons")) %>% 
-#   mutate(Capacity = (Capacity * 2.24), CapacityUnits = "Cubic Yards")
-# 
-# rest <- CR_sites %>% filter(str_detect(CapacityUnits, "Yards"))
-# bm_cap_B <- sum(rest$Capacity)
-# bm_cap_A <- sum(ton_sub$Capacity)
-# bm_cap <- bm_cap_A + bm_cap_B # cubic yards
-# 
-# bm_cap / 2.24
+write_csv(comp_swis, "data/swis_compost.csv")
 
 ###############################################################################################################
-# ALSO - Check against compost/active list (which has 182 entries, but no capacity units) - 
+# Check against compost/active list (which has 182 entries, but no capacity units) - 
 # join with larger SWIS databses and change UNITS to be consistent
+# (alternate download from swis database: CompostActive_FacilityDirectory-- is this different???)
+###############################################################################################################
+# comp_act_dir <- read_excel("data/CompostActive_FacilityDirectory.xlsx")
+# names(comp_act_dir)[1] <- "SwisNo"
+# coIDlist <- c(unique(comp_act_dir$SwisNo))
+
+# THIS IS NOT WORKING! ARRRG - only finding 9 that overlap???? 
+# swis_check <- swis_open %>% filter(SwisNo %in% coIDlist)
 
 
 ###############################################################################################################
+# CLEAN CAPACITY UNITS!!!!!
+###############################################################################################################
+# subset out stuff measured in tons - convert to cu yards
+# 1 ton = 2.24 cu yards compost
+
+CR_sites %>% filter(str_detect(CapacityUnits, "day")) %>% mutate(Capacity = Capacity * 365) %>% rbind(CR_sites)
 
 
-coordinates(swis)=~x+y
+ton_sub <- CR_sites %>% filter(str_detect(CapacityUnits, "Tons")) %>%
+  mutate(Capacity = (Capacity * 2.24), CapacityUnits = "Cubic Yards")
 
+rest <- CR_sites %>% filter(str_detect(CapacityUnits, "Yards"))
+bm_cap_B <- sum(rest$Capacity)
+bm_cap_A <- sum(ton_sub$Capacity)
+bm_cap <- bm_cap_A + bm_cap_B # cubic yards
+
+bm_cap / 2.24
+
+
+
+###############################################################################################################
+# MAKE SPATIAL
+###############################################################################################################
+coordinates(comp_swis)=~Longitude+Latitude
 
 # Convert to your regular km system by first telling it what CRS it is, and then spTransform to the destination.
 
-proj4string(swis)=CRS("+init=epsg:4326") # set it to lat-long
-swis = spTransform(swis,CRS("+proj=aea +lat_1=33.11213321093334 +lat_2=40.89742770321884 +lon_0=-119.59716796875"))
+proj4string(comp_swis)=CRS("+init=epsg:4326") # set it to lat-long
+comp_sp = spTransform(comp_swis,
+                        CRS("+proj=aea +lat_1=33.11213321093334 +lat_2=40.89742770321884 +lon_0=-119.59716796875"))
+
+writeOGR(comp_sp, "data/compost_spatial",driver = "ESRI Shapefile" , 
+         layer = "compost", overwrite_layer = TRUE)
 
 
 ###############################################################################################################
