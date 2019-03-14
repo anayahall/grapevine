@@ -1,0 +1,71 @@
+---
+title: "Cleaning Capacity Units"
+output: html_notebook
+---
+
+Load libarys and set WD
+```{r}
+library(tidyverse)
+library(dplyr)
+
+#set project wd
+setwd("/Users/anayahall/projects/grapevine")
+
+```
+
+
+Old playing around shit
+```{r}
+###############################################################################################################
+# CLEAN CAPACITY UNITS!!!!!
+###############################################################################################################
+comp_swis <- read_csv("data/swis_compost.csv")
+
+# subset out stuff measured in tons - convert to cu yards
+# 1 ton = 2.24 cu yards compost
+
+# CR_sites %>% filter(str_detect(CapacityUnits, "day")) %>% mutate(Capacity = Capacity * 365) %>% rbind(CR_sites)
+# 
+# 
+# ton_sub <- CR_sites %>% filter(str_detect(CapacityUnits, "Tons")) %>%
+#   mutate(Capacity = (Capacity * 2.24), CapacityUnits = "Cubic Yards")
+# 
+# rest <- CR_sites %>% filter(str_detect(CapacityUnits, "Yards"))
+# bm_cap_B <- sum(rest$Capacity)
+# bm_cap_A <- sum(ton_sub$Capacity)
+# bm_cap <- bm_cap_A + bm_cap_B # cubic yards
+# 
+# bm_cap / 2.24
+
+
+#subset out by type
+units_list <- unique(comp_swis$CapacityUnits)
+# summary(swis_clean$CapacityUnits == "Tons/day")
+```
+
+``` {r}
+# funciton to convert units into all same
+clean_capacity <- function(inputdata, arg2) {
+  nsites <- nrow(inputdata)
+  # inputdata <- as_data_frame(inputdata)
+  d <- mutate(inputdata, cap_yds = NA)
+  for(i in 1:nsites){
+    # print(i)
+    print(d[i,"CapacityUnits"])
+    if(d[i, "CapacityUnits"] == "Tons/year"){
+      print("tons")
+    }
+    else if(is.na(d[i, "CapacityUnits"]) == TRUE) {
+      print("NA")
+    }
+    else
+      print("foo")
+  }
+  #return(final_df)
+}
+
+#RUN FUNCITON
+clean_capacity(inputdata =comp_swis)
+
+```
+

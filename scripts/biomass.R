@@ -12,12 +12,12 @@ library(dplyr)
 setwd("/Users/anayahall/projects/grapevine")
 
 # Load both datasets
-biomass_all <- read_csv("data/biomass.inventory.csv")
+biomass_gross <- read_csv("data/biomass.inventory.csv")
 biomass_tech <- read_csv("data/biomass.inventory.technical.csv")
 
-county_list <- unique(biomass_all$COUNTY)
+county_list <- unique(biomass_gross$COUNTY)
 
-category_list <- unique(biomass_all$biomass.category)
+category_list <- unique(biomass_gross$biomass.category)
 
 # maybe try to plot?
 png("test.png", width = 960, height = 960)

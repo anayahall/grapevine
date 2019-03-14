@@ -125,6 +125,8 @@ write_csv(comp_swis, "data/swis_compost.csv")
 ###############################################################################################################
 # CLEAN CAPACITY UNITS!!!!!
 ###############################################################################################################
+comp_swis <- read_csv("data/swis_compost.csv")
+
 # subset out stuff measured in tons - convert to cu yards
 # 1 ton = 2.24 cu yards compost
 
@@ -144,17 +146,24 @@ write_csv(comp_swis, "data/swis_compost.csv")
 
 #subset out by type
 units_list <- unique(swis_clean$CapacityUnits)
-summary(swis_clean$CapacityUnits == "Tons/day")
+# summary(swis_clean$CapacityUnits == "Tons/day")
 
-# write funciton to convert units into all same
+# funciton to convert units into all same
+clean_capacity <- function(inputdata, arg2) {
+  nsites <- nrow(inputdata)
+  cleaned 
+  for(i in 1:nsites){
+    #print(i)
+    print(inputdata[i,"CapacityUnits"])
+    # if swis_clean$CapacityUnits == "Tons/day"
+    #   capacity_y3 ==
 
-# 
-# if swis_clean$CapacityUnits == "Tons/day"
-#   capacity_y3 ==
-#     
-#   }
+  }
+  #return(final_df)
+}
 
-
+#RUN FUNCITON
+clean_capacity(inputdata =comp_swis)
 
 ###############################################################################################################
 # MAKE SPATIAL
@@ -174,20 +183,20 @@ writeOGR(comp_sp, "data/compost_spatial",driver = "ESRI Shapefile" ,
 ###############################################################################################################
 # PLOT TO COMPARE DATA SOURCES
 
-# png("plots/compost_comparison.png", width = 1000, height = 1200, units = "px")
-# 
-# g <- ggplot(data = CA, mapping = aes(x = long, y = lat)) + 
-#   coord_fixed(1.3) + 
-#   geom_polygon(color = "black", fill = "white") + 
-#  #  geom_polygon(data = counties, aes(fill=region), color = "grey", fill = "white") +
-#   geom_point(data = open_sites, mapping = aes(x = long, y = lat), color = "orange1", size = 5, alpha=.5) +
-#   geom_point(data = epa_sites_geo, aes(x=lon, y=lat), color = "blue", size = 5, alpha=.5) +
-#   geom_point(data = CR_sites, aes(x = Longitude, y = Latitude), color = "green", size = 5, alpha=.5) +
-#   theme_minimal()
-# 
-# # NOTE : UniqueID == CPL01135 is on Catalina Island! 
-# # print map
-# g
-# 
-# dev.off()
+png("plots/model_overview.png", width = 1000, height = 1200, units = "px")
+
+g <- ggplot(data = CA, mapping = aes(x = long, y = lat)) +
+  coord_fixed(1.3) +
+  geom_polygon(color = "black", fill = "white") +
+ #  geom_polygon(data = counties, aes(fill=region), color = "grey", fill = "white") +
+  geom_point(data = open_sites, mapping = aes(x = long, y = lat), color = "orange1", size = 5, alpha=.5) +
+  geom_point(data = epa_sites_geo, aes(x=lon, y=lat), color = "blue", size = 5, alpha=.5) +
+  geom_point(data = CR_sites, aes(x = Longitude, y = Latitude), color = "green", size = 5, alpha=.5) +
+  theme_minimal()
+
+# NOTE : UniqueID == CPL01135 is on Catalina Island!
+# print map
+g
+
+dev.off()
 
