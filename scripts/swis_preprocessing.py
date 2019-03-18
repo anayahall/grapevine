@@ -10,10 +10,12 @@ import pandas as pd
 import os
 import numpy as np
 import shapely as sp
+from shapely.geometry import Point
 
 import matplotlib.pyplot as plt
 import geopandas as gpd
 from geopandas import GeoSeries, GeoDataFrame
+
 # only for jupyter nb to show plots inline
 #%matplotlib inline 
 
@@ -179,6 +181,8 @@ df.head()
 
 # In[206]:
 
+print("ABOUT to make SPATIAL")
+
 # Use geopandas instead
 # from: https://geohackweek.github.io/vector/04-geopandas-intro/
 geometry = [Point(xy) for xy in zip(df['Longitude'], df['Latitude'])]
@@ -187,6 +191,7 @@ gdf = GeoDataFrame(df, geometry=geometry)
 # check length to make sure it matches df
 len(geometry)
 
+print("MADE SPATIAL")
 
 # In[207]:
 
