@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[1]:
 
 # Script to clean pre-process BIOMASS INVENTORY and make spatial
 
@@ -10,15 +10,21 @@ import pandas as pd
 import os
 import numpy as np
 import shapely as sp
+import fiona
 
 import matplotlib.pyplot as plt
-import geopandas as gpd
+import geopandas
 from geopandas import GeoSeries, GeoDataFrame
+
+import plotly.plotly as py
+
 # only for jupyter nb to show plots inline
-#%matplotlib inline 
+# get_ipython().magic('matplotlib inline')
+
+print("BIOMASS PREPROCESSING")
 
 
-# In[10]:
+# In[2]:
 
 #check wd
 #print(os.getcwd())
@@ -34,7 +40,7 @@ gbm = pd.read_csv("data/raw/biomass.inventory.csv")
 tbm = pd.read_csv("data/raw/biomass.inventory.technical.csv")
 
 
-# In[50]:
+# In[3]:
 
 gbm.head()
 tbm.head()
@@ -46,43 +52,55 @@ len(gbm.COUNTY.unique())
 #yup, plus one "other"
 
 
-# In[13]:
+# In[4]:
 
 gbm['biomass.category'].value_counts()
 # same as technical
 
 
-# In[26]:
+# In[5]:
 
 gbm['biomass.feedstock'].value_counts().head()
 # same as technical
 # tbm['biomass.feedstock'].value_counts().head()
 
 
-# In[27]:
+# In[6]:
 
 gbm[gbm['disposal.yields'] == gbm['disposal.yields'].max()]
 
 
-# In[63]:
+# In[7]:
 
 #look at just manure (if feedstock, needs to be capitalized), if category, lower case -- should be equivalent!
 gbm[(gbm['biomass.feedstock'] == "MANURE") & (gbm['year'] == 2014)].head()
 
 
-# In[56]:
+# In[8]:
 
 #start grouping by: biomass category
 
 gbm.groupby(['biomass.category'])['disposal.yields'].sum()
 
 
-# In[64]:
+# In[9]:
 
 gbm[gbm['biomass.category'] == "manure"].groupby(['COUNTY'])['disposal.yields'].sum().head()
+
+
+# In[10]:
+
+# now load shapefile for CA counties to merge this
+
+UScounties = fiona.open("data/raw/tl_2018_06_tract/tl_2018_06_tract.shp")
 
 
 # In[ ]:
 
 
+
+
+# In[11]:
+
+print("DONE RUNNING")
 

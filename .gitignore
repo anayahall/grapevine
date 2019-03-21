@@ -4,5 +4,6 @@
 .Ruserdata
 data/
 plots/
+maps/
 .ipynb_checkpoints/
 scripts/.DS_Store

@@ -4,11 +4,11 @@ os.chdir("/Users/anayahall/projects/grapevine")
 
 # PREPROCESSINGS
 # compost
-import swis_preprocessing.py
+import swis_preprocessing
 
 #os.system("scripts/swis_preprocessing.py")
 
 # biomass
-import biomass_preprocessing.py
+import biomass_preprocessing
 
 # FARMS???
