@@ -13,15 +13,15 @@ import shapely as sp
 import fiona
 
 import matplotlib.pyplot as plt
-import geopandas
+import geopandas as gpd
 from geopandas import GeoSeries, GeoDataFrame
 
 import plotly.plotly as py
 
 # only for jupyter nb to show plots inline
-# get_ipython().magic('matplotlib inline')
+#%matplotlib inline 
 
-print("BIOMASS PREPROCESSING")
+print("*BIOMASS PREPROCESSING SCRIPT BEGINS*")
 
 
 # In[2]:
@@ -92,15 +92,83 @@ gbm[gbm['biomass.category'] == "manure"].groupby(['COUNTY'])['disposal.yields'].
 
 # now load shapefile for CA counties to merge this
 
-UScounties = fiona.open("data/raw/tl_2018_06_tract/tl_2018_06_tract.shp")
+#UScounties = fiona.open("data/raw/tl_2018_06_tract/tl_2018_06_tract.shp")
+print("read in county shapefile")
+CA = gpd.read_file("data/raw/tl_2018_06_tract/tl_2018_06_tract.shp")
 
 
-# In[ ]:
+# In[36]:
+
+CA.tail()
 
 
+# In[12]:
+
+# CREATE FIPS ID to merge with county names
+#CAshape.FIPS = str(CAshape.STATEFP) + str(CAshape.COUNTYFP)
+CA['FIPS']=CA['STATEFP'].astype(str)+CA['COUNTYFP']
+
+# get rid of leading zero
+CA.FIPS = [s.lstrip("0") for s in CA.FIPS]
+
+#convert to integer for merging below
+CA.FIPS = [int(i) for i in CA.FIPS]
 
 
-# In[11]:
+# In[13]:
 
-print("DONE RUNNING")
+# NEED TO BRING IN COUNTY NAMES TO MERGE WITH BIOMASS DATA
+countyIDs = pd.read_csv("data/interim/CA_FIPS.csv", names = ["FIPS", "COUNTY", "State"])
+countyIDs
+
+type(countyIDs.FIPS[0])
+type(CA.FIPS[0])
+
+CAshape = pd.merge(CA, countyIDs, on = 'FIPS')
+
+CAshape.head()
+
+
+# In[14]:
+
+type(CAshape)
+
+
+# In[28]:
+
+# now can merge with biomass data finally!!!
+gbm.columns
+print("merging biomass data with CA shapefile")
+
+gbm_shp = pd.merge(CAshape, gbm, on = 'COUNTY')
+
+# Do same for technical biomass
+tbm_shp = pd.merge(CAshape, tbm, on = 'COUNTY')
+
+
+# In[34]:
+
+type(tbm_shp)
+tbm_shp.tail()
+
+
+gbm_shp[gbm_shp['biomass.category'] == "manure"].groupby(['COUNTY'])['disposal.yields'].sum().head()
+
+
+# In[25]:
+
+# # play around with plotting ??? COME BACK TO
+# gbm['disposal.yields']
+
+# # set a variable that will call whatever column we want to visualise on the map
+# variable = "disposal.yields"
+# # set the range for the choropleth
+# vmin, vmax = 100, 2500000
+# # create figure and axes for Matplotlib
+# fig, ax = plt.subplots(1, figsize=(10, 6))
+
+
+# In[35]:
+
+print("DONE RUNNING -- come back to play with grouping and/or plotting")
 
