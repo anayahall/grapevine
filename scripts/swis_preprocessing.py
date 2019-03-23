@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[195]:
+# In[14]:
 
 # Script to clean capacity values of SWIS compost sites and make spatial
 
@@ -15,12 +15,11 @@ from shapely.geometry import Point
 import matplotlib.pyplot as plt
 import geopandas as gpd
 from geopandas import GeoSeries, GeoDataFrame
-
 # only for jupyter nb to show plots inline
 #%matplotlib inline 
 
 
-# In[196]:
+# In[15]:
 
 #check wd
 #print(os.getcwd())
@@ -28,11 +27,16 @@ from geopandas import GeoSeries, GeoDataFrame
 #change wd
 os.chdir("/Users/anayahall/projects/grapevine")
 
+#######################################################################
+# Starting from INTERIM data (somewhat preprocessed in R - may come back to)
+#######################################################################
+
+
 #read in compost facilities csv
 df = pd.read_csv("data/interim/swis_compost.csv")
 
 
-# In[197]:
+# In[16]:
 
 df.columns
 #df.head()
@@ -40,17 +44,17 @@ df.columns
 #df.info()
 
 
-# In[198]:
+# In[17]:
 
 df.County.value_counts(dropna=False).head()
 
 
-# In[199]:
+# In[18]:
 
 df['CapacityUnits'].value_counts(dropna=False)
 
 
-# In[200]:
+# In[19]:
 
 # Identify and recode oddly labeled capacity units (those lacking time unit)
 # first: Tons
@@ -70,7 +74,7 @@ for i in range(n):
 # print('foo', foo)
 
 
-# In[201]:
+# In[20]:
 
 #df[df.CapacityUnits=="Cubic Yards"]
 
@@ -98,7 +102,7 @@ for i in range(n):
 df[df.CapacityUnits=="Cubic Yards"]
 
 
-# In[202]:
+# In[21]:
 
 # first filter out all th
 df = df[df['Capacity'].notnull()]
@@ -112,27 +116,27 @@ df['cap_m3'] = 0.0
 df.tail()
 
 
-# In[203]:
+# In[22]:
 
 # write function to convert all capacity units into cubic meters/month!
 
 #how to assign values:
 # df.at[i, 'CapacityUnits'] = "Tons/year"
 
-print("CLEANING CAPACITY - CONVERT TO CUBIC METERS / MONTH")
+print("CLEANING CAPACITY - CONVERT TO CUBIC METERS / YEAR")
 n = len(df.index)
 for i in range(n):
     #print("index: ", i)
     if df.CapacityUnits[i] == "Tons/year":
         # print("tons/year")
-        # tons/year * cu yards/ton * cu meters/cu yards * years/month 
-        #df.cap_m3[i] = df.Capacity[i] * 2.24 * 0.764555 * (1/12)
-        df.at[i, 'cap_m3'] = df.Capacity[i] * 2.24 * 0.764555 * (1/12)
+        # tons/year * cu yards/ton * cu meters/cu yards  
+        #df.cap_m3[i] = df.Capacity[i] * 2.24 * 0.764555 
+        df.at[i, 'cap_m3'] = df.Capacity[i] * 2.24 * 0.764555
         # print(df.cap_m3[i])
     elif df.CapacityUnits[i] == "Cu Yards/year":
         # print("cu yrds/year")
-        # cu yards/year * cu meters/cu yards * years/month 
-        df.at[i, 'cap_m3'] = df.Capacity[i] * 0.764555 * (1/12)
+        # cu yards/year * cu meters/cu yards 
+        df.at[i, 'cap_m3'] = df.Capacity[i] * 0.764555 
         # print(df.cap_m3[i])
     elif df.CapacityUnits[i] == "Cubic Yards":
         print("index: ", i ," - cu yrds --- NEED TO DISENTANGLE STILL!")
@@ -141,13 +145,13 @@ for i in range(n):
         print("tons") #there should be none of these
         # print(df.cap_m3[i])
     elif df.CapacityUnits[i] == "Tons/day":
-        # tons/day * cu yards/ton * cu meters/cu yards * days/year * years/month 
-        df.at[i, 'cap_m3'] = df.Capacity[i] * 2.24 * 0.764555 * (365/1) * (1/12)
+        # tons/day * cu yards/ton * cu meters/cu yards * days/year 
+        df.at[i, 'cap_m3'] = df.Capacity[i] * 2.24 * 0.764555 * (365/1) 
         # print("tons/day")
         # print(df.cap_m3[i])
     elif df.CapacityUnits[i] == "Cu Yards/month":
-        # cu yards/month * cu meters/cu yards 
-        df.at[i, 'cap_m3'] = df.Capacity[i] * 0.764555
+        # cu yards/month * cu meters/cu yards * months/year
+        df.at[i, 'cap_m3'] = df.Capacity[i] * 0.764555 * 12
         # print("cu yrds/month")
         # print(df.cap_m3[i])
     elif df.CapacityUnits[i] == "Tires/day":
@@ -159,11 +163,10 @@ for i in range(n):
 # will also need a function to convert waste volume into compost volume
 
 
-# In[204]:
+# In[23]:
 
 # Last thing is to make all points spatial
 # try using shapely package
-# from shapely.geometry import Point
 
 # point = Point(df.Longitude[0], df.Latitude[0])
 
@@ -174,14 +177,21 @@ for i in range(n):
 #     df.points[i] = Point(df.Longitude[i], df.Latitude[i])
 
 
-# In[205]:
+# In[24]:
 
 df.head()
 
 
-# In[206]:
+# In[25]:
 
-print("ABOUT to make SPATIAL")
+# df.columns
+# m3 * yd3/m3 * tons/yd3
+#cap_m3 * (1/0.764555) * (1/2.24)
+
+sum(df.cap_m3) * (1/0.764555) * (1/2.24)
+
+
+# In[26]:
 
 # Use geopandas instead
 # from: https://geohackweek.github.io/vector/04-geopandas-intro/
@@ -191,26 +201,28 @@ gdf = GeoDataFrame(df, geometry=geometry)
 # check length to make sure it matches df
 len(geometry)
 
-print("MADE SPATIAL")
 
-# In[207]:
+# In[27]:
 
 gdf.plot(marker='*', color='green', markersize=50, figsize=(3, 3))
 
 
-# In[208]:
+# In[28]:
 
 df.head()
 
 
-# In[215]:
+# In[29]:
 
 gdf.crs = {'init' :'epsg:3310'}
 # save as??? 
 
+print("exporting shapefile")
 out = r"/Users/anayahall/projects/grapevine/data/clean/clean_swis.shp"
 
 type(gdf)
 
 gdf.to_file(driver='ESRI Shapefile', filename=out)
+
+print("DONE")
 
