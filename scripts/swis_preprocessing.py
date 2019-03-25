@@ -212,17 +212,23 @@ gdf.plot(marker='*', color='green', markersize=50, figsize=(3, 3))
 df.head()
 
 
-# In[29]:
+# In[33]:
 
-gdf.crs = {'init' :'epsg:3310'}
-# save as??? 
+gdf.crs = {'init' :'epsg:4326'}
 
+
+# gdf.head()
 print("exporting shapefile")
 out = r"/Users/anayahall/projects/grapevine/data/clean/clean_swis.shp"
 
-type(gdf)
+# type(gdf)
 
 gdf.to_file(driver='ESRI Shapefile', filename=out)
 
 print("DONE")
+
+
+# In[34]:
+
+
 
