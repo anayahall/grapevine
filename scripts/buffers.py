@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 # making buffers ! - first use geometric, later base on transport distance?
 
@@ -15,18 +15,27 @@ import matplotlib.pyplot as plt
 import geopandas as gpd
 from geopandas import GeoSeries, GeoDataFrame
 # only for jupyter nb to show plots inline
-get_ipython().magic('matplotlib inline')
+# %matplotlib inline 
 
 
-# In[205]:
+# In[2]:
 
 #change wd
 os.chdir("/Users/anayahall/projects/grapevine")
 
 gdf =  gpd.read_file("data/clean/clean_swis.shp")
+# load census tract shapefile
 CA = gpd.read_file("data/raw/tl_2018_06_tract/tl_2018_06_tract.shp")
 # print(CA.crs)
 # CA.plot()
+
+
+# In[25]:
+
+# try plotting by size of facility
+# gdf.head()
+# gdf.cap_m3
+# gdf.plot(marker = 'o', markersize = gdf.cap_m3/1000)
 
 
 # In[207]:
@@ -77,13 +86,18 @@ gdf.plot(ax=CA.plot(cmap='Set3', figsize=(10, 6)), marker='o', markersize=15)
 # plt.savefig("maps/map_export.png", dpi=300)
 
 
-# In[147]:
+# In[31]:
 
 # better plot, with title
 f, ax = plt.subplots(1)
 CA.plot(ax = ax, cmap='Set3', figsize = (10,6), linewidth=0.1)
-gdf.plot(ax = ax, markersize = 2, marker = '*', color = 'black')
+gdf.plot(ax = ax, markersize = gdf.cap_m3/10000, marker = 'o', color = 'black', alpha=.7)
 ax.axis('off')
 ax.set_title('Composting Permits in CA', fontdict={'fontsize': '12', 'fontweight' : '3'})
-# plt.savefig("maps/map_export.png", dpi=300)
+plt.savefig("maps/FacilitiesbyCapacity.png", dpi=300)
+
+
+# In[ ]:
+
+
 
