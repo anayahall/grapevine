@@ -48,7 +48,9 @@ Fiona==1.8.4
 Flask==0.10.1
 Flask-Cors==3.0.2
 future==0.17.1
+geographiclib==1.49
 geopandas==0.4.0
+geopy==1.19.0
 gevent==1.2.1
 greenlet==0.4.12
 h5py==2.7.0
@@ -117,6 +119,7 @@ ply==3.10
 prompt-toolkit==1.0.14
 psutil==5.2.2
 ptyprocess==0.5.1
+PuLP==1.6.9
 py==1.4.33
 pycosat==0.6.2
 pycparser==2.17

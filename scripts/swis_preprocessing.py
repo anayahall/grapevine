@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[14]:
+# In[1]:
 
 # Script to clean capacity values of SWIS compost sites and make spatial
 
@@ -19,7 +19,7 @@ from geopandas import GeoSeries, GeoDataFrame
 #%matplotlib inline 
 
 
-# In[15]:
+# In[2]:
 
 #check wd
 #print(os.getcwd())
@@ -30,16 +30,19 @@ os.chdir("/Users/anayahall/projects/grapevine")
 #######################################################################
 # Starting from INTERIM data (somewhat preprocessed in R - may come back to)
 #######################################################################
-
+# from R: 
+# orginal data cleaned from excel: "data/swis_clean.csv"
+# #filter to composting (may come back to this to select all other sites as well)
+# comp_swis <- swis_clean %>% filter(str_detect(Activity, "Compost") | str_detect(Activity, "Chip") & OperationalStatus != "Closed")
 
 #read in compost facilities csv
 df = pd.read_csv("data/interim/swis_compost.csv")
 
 
-# In[16]:
+# In[3]:
 
 df.columns
-#df.head()
+df.head()
 #df.tail()
 #df.info()
 

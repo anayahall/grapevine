@@ -1,0 +1,57 @@
+---
+title: "Compost LP Formulation"
+output: pdf_document
+fontsize: 11pt
+geometry: margin=.75in 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+$i$ : Index of county ($1,...,n$)  
+$j$ : Index of facilities ($1,...,m$)  
+
+$$CO_2e = \sum_{i=1}^{n}TC_i S_i + \sum_{i=1}^{n} (1-\sum_{j=1}^{m}s_{ij})W_i\cdot f +  \sum_{j=1}^{m}(1-\sum_{i=1}^{n}d_{ij})TC_i\cdot g + \sum_{i=1}^{n} \sum_{j=1}^{m} h \cdot D_{ij} s_{ij} W_i$$
+
+$$ Cost = \sum_{i=1}^{n} \sum_{j=1}^{m} d \cdot D_{ij} s_{ij} W_i +  \sum_{i=1}^{n} \sum_{j=1}^{m} e \cdot L_{ji}d_{ji} TC_i$$
+
+subject to: 
+
+$I_j \leq F_j$  
+$TC_i \leq C_i$  
+$\sum_{j=1}^{m} s_{ij} \leq 1$  
+$\sum_{i=1}^{n} d_{ij} \leq 1$  
+$0 \leq s_{ij} \leq 1$  
+$0 \leq d_{ij} \leq 1$  
+
+where  
+
+$D_{ij}$ : distance to haul to facility $j$ ($f_j$ ) from county $i$ ($c_i$)  
+$L_{ji}$ : distance from $f_j$ to $c_i$ working land  
+$W_i$ : Waste available in county $i$  
+$F_j$ : Intake capacity of facility $j$  
+$C_i$ : Amount of output county $i$ can take in (based on amount of land)  
+
+$s_{ij}$ : proportion of $W_i$ to send to $f_j$  
+$d_{ji}$ : proportion of facility $f_j$ output to send to $c_i$ working land  
+
+and 
+
+$S_i$ : sequestration potential per ton (?) compost applied in county $c_i$  
+$c$ : conversion factor of waste into compost  (%)  
+$f$ : emission factor for waste left in county ($\frac {CO2_{e}}{ton}$)   
+$g$ : emission factor for compost stranded at facility  ($\frac {CO2_{e}}{ton}$)   
+$e$ : cost to haul away from facility to land  ($\frac {\$}{ton \cdot mi}$)  
+$d$ : cost to haul to facility from county ($\frac {\$}{ton \cdot mi}$)  
+$h$ : transportation emission factor ($\frac {CO2_{e}}{ton \cdot mi}$)  
+
+Intake for each facility is sum of the proportion taken in from $c_i$ for $i = 1,...,n$  
+$I_j = \sum_{i=1}^{n} s_{ij} W_i$ 
+
+Output of each facility is equal to intake converted into compost  
+$O_j = c \cdot I_j$  
+
+Total compost applied in each county is the sum of the proporion of output from $f_j$ for $j = 1,...,m$  
+$TC_i = \sum_{j=1}^{m} d_{ij} O_j$  
+
