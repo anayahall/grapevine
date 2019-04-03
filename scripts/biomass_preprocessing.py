@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[75]:
+# In[33]:
 
 # Script to clean pre-process BIOMASS INVENTORY and make spatial
 
@@ -20,12 +20,16 @@ from geopandas import GeoSeries, GeoDataFrame
 import plotly.plotly as py
 
 # only for jupyter nb to show plots inline
-#%matplotlib inline 
+# %matplotlib inline 
 
-print("*BIOMASS PREPROCESSING SCRIPT BEGINS*")
+# print("*BIOMASS PREPROCESSING SCRIPT BEGINS*")
+def epsg_meters(gdf, proj=26911):
+    g = gdf.copy()
+    g = g.to_crs(epsg=proj)
+    return g
 
 
-# In[76]:
+# In[4]:
 
 #check wd
 #print(os.getcwd())
@@ -89,23 +93,23 @@ gbm.groupby(['biomass.category'])['disposal.yields'].sum()
 gbm[gbm['biomass.category'] == "manure"].groupby(['COUNTY'])['disposal.yields'].sum().head()
 
 
-# In[84]:
+# In[37]:
 
 # now load SHAPEFILE for all CA COUNTIES to merge this
-print("read in CA CENSUS TRACTS shapefile")
-CAct = gpd.read_file("data/raw/tl_2018_06_tract/tl_2018_06_tract.shp")
+print("read in CA COUNTIES shapefile and reproject")
+CA_proj = gpd.read_file("data/raw/CA_Counties/CA_Counties_TIGER2016.shp")
+CA_proj.head()
+
+CA = epsg_meters(CA_proj)
+CA.head()
 
 
 # In[85]:
 
-#CAct.groupby(['COUNTYFP'])
-# create subset of just COUNTIES
-CA = CAct.drop_duplicates('COUNTYFP').copy()
-
-type(CA)
+# type(CA)
 
 
-# In[86]:
+# In[38]:
 
 # Create new geoseries of county centroids - 
 # note, technically still a panda series until 'set_geomtry()' is called
@@ -113,13 +117,13 @@ CA['cocent'] = CA['geometry'].centroid
 CA.tail()
 
 
-# In[87]:
+# In[39]:
 
 # both set geometry (see above) and plot to check it looks right
 CA.set_geometry('cocent').plot()
 
 
-# In[88]:
+# In[40]:
 
 # CREATE FIPS ID to merge with county names
 #CAshape.FIPS = str(CAshape.STATEFP) + str(CAshape.COUNTYFP)
@@ -130,9 +134,10 @@ CA.FIPS = [s.lstrip("0") for s in CA.FIPS]
 
 #convert to integer for merging below
 CA.FIPS = [int(i) for i in CA.FIPS]
+CA.head()
 
 
-# In[89]:
+# In[41]:
 
 # NEED TO BRING IN COUNTY NAMES TO MERGE WITH BIOMASS DATA
 countyIDs = pd.read_csv("data/interim/CA_FIPS.csv", names = ["FIPS", "COUNTY", "State"])
@@ -143,16 +148,17 @@ type(CA.FIPS[0])
 
 CAshape = pd.merge(CA, countyIDs, on = 'FIPS')
 
+CAshape.head()
 
 
-# In[90]:
+# In[42]:
 
-# Create subset of just county centroid points 
+# Create subset of just county centroid points NOT POLYGONS
 CAshape.head()
 
 CA_pts = CAshape.set_geometry('cocent')[['cocent','FIPS', 'COUNTY', 'ALAND', 'AWATER']]
 
-type(CA_pts)
+# type(CA_pts)
 
 # CA_pts.plot()
 # CA_pts.head()
@@ -163,7 +169,7 @@ type(CA_pts)
 # type(CAshape)
 
 
-# In[92]:
+# In[43]:
 
 # now can merge with biomass data finally!!!
 gbm.columns
@@ -180,9 +186,9 @@ gbm_pts = pd.merge(CA_pts, gbm, on = 'COUNTY')
 tbm_pts = pd.merge(CA_pts, tbm, on = 'COUNTY')
 
 
-# In[93]:
+# In[45]:
 
-gbm_pts.head()
+# tbm_pts.plot()
 
 
 # In[94]:
@@ -199,7 +205,7 @@ gbm_pts.head()
 # type(tbm_subshp)
 
 
-# In[97]:
+# In[46]:
 
 # export as SHAPEFILE
 

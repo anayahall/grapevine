@@ -27,8 +27,8 @@ $0 \leq d_{ij} \leq 1$
 
 where  
 
-$D_{ij}$ : distance to haul to facility $j$ ($f_j$ ) from county $i$ ($c_i$)  
-$L_{ji}$ : distance from $f_j$ to $c_i$ working land  
+$D_{ij}$ : distance to haul to facility $j$ ($f_j$ ) from county $i$ ($c_i$)  (km)
+$L_{ji}$ : distance from $f_j$ to $c_i$ working land  (km)
 $W_i$ : Waste available in county $i$  
 $F_j$ : Intake capacity of facility $j$  
 $C_i$ : Amount of output county $i$ can take in (based on amount of land)  
@@ -42,9 +42,9 @@ $S_i$ : sequestration potential per ton (?) compost applied in county $c_i$
 $c$ : conversion factor of waste into compost  (%)  
 $f$ : emission factor for waste left in county ($\frac {CO2_{e}}{ton}$)   
 $g$ : emission factor for compost stranded at facility  ($\frac {CO2_{e}}{ton}$)   
-$e$ : cost to haul away from facility to land  ($\frac {\$}{ton \cdot mi}$)  
-$d$ : cost to haul to facility from county ($\frac {\$}{ton \cdot mi}$)  
-$h$ : transportation emission factor ($\frac {CO2_{e}}{ton \cdot mi}$)  
+$e$ : cost to haul away from facility to land  ($\frac {\$}{ton \cdot km}$)  
+$d$ : cost to haul to facility from county ($\frac {\$}{ton \cdot km}$)  
+$h$ : transportation emission factor ($\frac {CO2_{e}}{ton \cdot km}$)  
 
 Intake for each facility is sum of the proportion taken in from $c_i$ for $i = 1,...,n$  
 $I_j = \sum_{i=1}^{n} s_{ij} W_i$ 
