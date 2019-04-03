@@ -1,25 +1,25 @@
 \* Compost Distribution Problem *\
 Maximize
-Sum_of_Transporting_Costs: 61285.9269356 Route_Imperial_13_AA_0095
- + 774663.765766 Route_Imperial_19_AA_1060
- + 734022.973865 Route_Imperial_19_AR_5584
- + 555753.948348 Route_Imperial_30_AB_0378
- + 382332.933263 Route_Imperial_37_AB_0011
- + 809713.405343 Route_Los_Angeles_13_AA_0095
- + 66508.4231411 Route_Los_Angeles_19_AA_1060
- + 70214.024712 Route_Los_Angeles_19_AR_5584
- + 249245.727376 Route_Los_Angeles_30_AB_0378
- + 484952.287482 Route_Los_Angeles_37_AB_0011
- + 595801.832635 Route_Orange_13_AA_0095
- + 242016.96541 Route_Orange_19_AA_1060
- + 189817.025812 Route_Orange_19_AR_5584
- + 36498.5855999 Route_Orange_30_AB_0378
- + 245672.593896 Route_Orange_37_AB_0011
- + 428140.350776 Route_San_Diego_13_AA_0095
- + 460512.854002 Route_San_Diego_19_AA_1060
- + 409713.506054 Route_San_Diego_19_AR_5584
- + 218940.005264 Route_San_Diego_30_AB_0378
- + 24701.0922261 Route_San_Diego_37_AB_0011
+Sum_of_Transporting_Costs: 20609.9989803 Route_Imperial_13_AA_0095
+ + 780276.585978 Route_Imperial_19_AA_1060
+ + 743524.25104 Route_Imperial_19_AR_5584
+ + 575489.559929 Route_Imperial_30_AB_0378
+ + 430473.26782 Route_Imperial_37_AB_0011
+ + 749736.862516 Route_Los_Angeles_13_AA_0095
+ + 34472.8851429 Route_Los_Angeles_19_AA_1060
+ + 22085.7423126 Route_Los_Angeles_19_AR_5584
+ + 207405.979811 Route_Los_Angeles_30_AB_0378
+ + 450398.101751 Route_Los_Angeles_37_AB_0011
+ + 589287.808106 Route_Orange_13_AA_0095
+ + 218380.793376 Route_Orange_19_AA_1060
+ + 168868.936288 Route_Orange_19_AR_5584
+ + 23645.3173082 Route_Orange_30_AB_0378
+ + 267076.941807 Route_Orange_37_AB_0011
+ + 321270.366374 Route_San_Diego_13_AA_0095
+ + 511349.722419 Route_San_Diego_19_AA_1060
+ + 464812.396318 Route_San_Diego_19_AR_5584
+ + 275763.383817 Route_San_Diego_30_AB_0378
+ + 107245.383437 Route_San_Diego_37_AB_0011
 Subject To
 Sum_of_compost_into_Facilities_13_AA_0095: Route_Imperial_13_AA_0095
  + Route_Los_Angeles_13_AA_0095 + Route_Orange_13_AA_0095
