@@ -12,9 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 $i$ : Index of county ($1,...,n$)  
 $j$ : Index of facilities ($1,...,m$)  
 
-$$CO_2e = \sum_{i=1}^{n}TC_i S_i + \sum_{i=1}^{n} (1-\sum_{j=1}^{m}s_{ij})W_i\cdot f +  \sum_{j=1}^{m}(1-\sum_{i=1}^{n}d_{ij})TC_i\cdot g + \sum_{i=1}^{n} \sum_{j=1}^{m} h \cdot D_{ij} s_{ij} W_i$$
+$$CO_2e = \sum_{i=1}^{n}TC_i S_i + \sum_{i=1}^{n} (1-\sum_{j=1}^{m}s_{ij})W_i\cdot f +  \sum_{j=1}^{m}(1-\sum_{i=1}^{n}d_{ij})TC_i\cdot g + \sum_{i=1}^{n} \sum_{j=1}^{m} h \cdot D_{ij} s_{ij} W_i + \sum_{i=1}^{n} \sum_{j=1}^{m} h \cdot L_{ji}d_{ji} TC_i + \sum_{j=1}^m s_{ij} W_i$$
 
-$$ Cost = \sum_{i=1}^{n} \sum_{j=1}^{m} d \cdot D_{ij} s_{ij} W_i +  \sum_{i=1}^{n} \sum_{j=1}^{m} e \cdot L_{ji}d_{ji} TC_i$$
+$$ Cost = \sum_{i=1}^{n} \sum_{j=1}^{m} d \cdot D_{ij} s_{ij} W_i +  \sum_{i=1}^{n} \sum_{j=1}^{m} e \cdot L_{ji}d_{ji} TC_i +  \sum_{i=1}^n k \cdot TC_i$$
 
 subject to: 
 
@@ -44,7 +44,9 @@ $f$ : emission factor for waste left in county ($\frac {CO2_{e}}{ton}$)
 $g$ : emission factor for compost stranded at facility  ($\frac {CO2_{e}}{ton}$)   
 $e$ : cost to haul away from facility to land  ($\frac {\$}{ton \cdot km}$)  
 $d$ : cost to haul to facility from county ($\frac {\$}{ton \cdot km}$)  
-$h$ : transportation emission factor ($\frac {CO2_{e}}{ton \cdot km}$)  
+$h$ : transportation emission factor ($\frac {CO2_{e}}{ton \cdot km}$) (separate??)
+$k$ : cost to apply compost to fields ($\frac {\$}{ton}$)
+$t$ : cost to apply compost to fields ($\frac {CO2_{e}}{ton}$)  
 
 Intake for each facility is sum of the proportion taken in from $c_i$ for $i = 1,...,n$  
 $I_j = \sum_{i=1}^{n} s_{ij} W_i$ 
