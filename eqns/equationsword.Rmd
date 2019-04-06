@@ -2,7 +2,7 @@
 title: "equations_word"
 author: "Anaya Hall"
 date: "4/1/2019"
-output: word_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}

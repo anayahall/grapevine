@@ -2,7 +2,7 @@
 
 # define function to convert into proj in meters 
 # (use epsg=26911 for statewide California, can change for others)
-# alt is 3857
+# alt is 3857 or 3310
 def epsg_meters(gdf, proj=3310):
     g = gdf.copy()
     g = g.to_crs(epsg=proj)
