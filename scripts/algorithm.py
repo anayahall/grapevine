@@ -2,17 +2,26 @@
 import os
 os.chdir("/Users/anayahall/projects/grapevine")
 
-# PREPROCESSINGS
-# compost
+import parameters 
+
+# PREPROCESSINGS & Data WRANGLING
+## compost facilities
 import swis_preprocessing
 
-#os.system("scripts/swis_preprocessing.py")
 
-# biomass
+## biomass inventory (both gross & technical)
 import biomass_preprocessing
+### RESHAPE FROM LONG TO WIDE?
 
-# FARMS???
+## rangelands (for now just rl...)
+import land
 
-# buffers
-import buffers
+# DISTANCE MATRICIES
 
+## calculate cost distance matricies --> formalize into function!
+import distance_mat
+
+# RUN LP ALGORITHM
+import LP_test # <- NEED TO MAKE THIS REAL STILL
+
+# VIEW RESULTS???

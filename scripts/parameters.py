@@ -6,8 +6,8 @@ waste_type = # select out of biomass inventory
 
 
 # SWIS
-swf_type 	# solid waste facility type
-opc			# operating cost
+#swf_type 	# solid waste facility type
+#opc			# operating cost
 tc			# transportation cost
 
 
@@ -25,7 +25,6 @@ tc			# transportation cost
 
 
 ### conversion factors
-
 
 # bdt waste to waste
 
