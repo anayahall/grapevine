@@ -6,9 +6,7 @@
  ###################################################################
 
 
-- BUFFERS: base on roadway netowrk - 50 miles --> 
 - PARAMETERS for soil application - 
-	--> (exclude certain properties of land (ie SLOPE)?)
 - calculate % and absolute (m2) rangeland and % and absolute (m2) area cropland
 - LATEr can add # of farm operations and compare operatiosn (but these are all county level)
 - look at other uses (ie A/D - econ part done?)
@@ -23,7 +21,6 @@ TO DO
 
 ###################################################################
 
- - PRESENTATION
  - FINISH LINPROG BUILD-OUT
 
 
@@ -42,12 +39,4 @@ TO DO
 
 # COST OF IMPLEMENTING?	
 # 
-
-
-
-
-########### QUESTIONS FOR JEFF ###########################
- - good RATIO for good compost!
-
-
 

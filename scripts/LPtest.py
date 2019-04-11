@@ -1,9 +1,15 @@
 
 # coding: utf-8
 
-# In[268]:
+# In[11]:
 
-# MINI TEST
+"""
+MINI TEST OF LINEAR PROGRAMMING PULP MODEL
+Mini-dicts of counties and facilities,
+currently based on 'beer distribution model'
+>> need to rewrite CORRECTLY
+"""
+
 import pandas as pd
 import os
 import numpy as np
@@ -21,14 +27,15 @@ from scipy.spatial import distance_matrix
 os.chdir("/Users/anayahall/projects/grapevine")
 
 
-# In[269]:
+# In[21]:
 
 ############################################################
 # FUNCTIONS USED IN THIS SCRIPT
 
 # define function to convert into proj in meters 
 # (use epsg=26911 for statewide California, can change for others)
-def epsg_meters(gdf, proj=26911):
+# alt is 3857 or 3310
+def epsg_meters(gdf, proj=3310):
     g = gdf.copy()
     g = g.to_crs(epsg=proj)
     return g
@@ -52,7 +59,7 @@ def geo_to_coords(df):
             df.at[index,'coord'] = np.asarray(pt)
 
 
-# In[270]:
+# In[26]:
 
 # mini gdfs of county wastes (tbm - location and MSW for 2014) 
 c_proj = gpd.read_file("data/clean/techbiomass_pts.shp")
@@ -71,7 +78,7 @@ csub = c[(c['COUNTY'] == "Los Angeles") | (c['COUNTY'] == "San Diego")|
 # csub.head()
 
 
-# In[271]:
+# In[14]:
 
 ####MAKE DICTIONARY HERE
 cdict = dict(zip(csub['COUNTY'], csub['disposal.y']))
@@ -80,7 +87,7 @@ cdict = dict(zip(csub['COUNTY'], csub['disposal.y']))
 conames = get_dict_names(cdict)
 
 
-# In[272]:
+# In[24]:
 
 # Mini gdfs of facilites (location and capacity)
 f_proj = gpd.read_file("data/clean/clean_swis.shp")
@@ -103,7 +110,7 @@ fdict = dict(zip(fsub['SwisNo'], fsub['cap_m3']))
 facnames = get_dict_names(fdict)
 
 
-# In[291]:
+# In[16]:
 
 # CREATE DISTANCE MATRIX #################################
 
@@ -128,7 +135,7 @@ cost_distance = [d * 1.4 for d in cost_distance]
 # cost_distance
 
 
-# In[290]:
+# In[17]:
 
 # CHECK distances to make sure they're in the right place - this test STILL IN DEGREES!
 # import math
@@ -139,7 +146,7 @@ cost_distance = [d * 1.4 for d in cost_distance]
 # Checks out! 
 
 
-# In[280]:
+# In[18]:
 
 #FIRST RUN TEST - BASED ON BEER DISTRIBUTION EXAMPLE
 # Import PuLP modeler functions
@@ -175,11 +182,11 @@ Routes = [(c,f) for c in Counties for f in Facilities]
 vars = LpVariable.dicts("Route",(Counties,Facilities),0,None,LpInteger)
 
 # The objective function is added to 'prob' first
-prob += lpSum([vars[c][f]*costs[c][f]*emfac for (c,f) in Routes]), "Sum_of_Transporting_Costs"
+prob += lpSum([vars[c][f]*costs[c][f] for (c,f) in Routes]) + lpSum([vars[c][f]*emfac for (c,f) in Routes]), "Sum_of_Transporting_Costs"
 
 # # The supply maximum constraints are added to prob for each supply node (warehouse)
 for c in Counties:
-    prob += lpSum([vars[c][f] for f in Facilities])<=waste[c], "Sum_of_waste_out_of_Counties_%s"%c
+    prob += lpSum([vars[c][f] for f in Facilities]) <= waste[c], "Sum_of_waste_out_of_Counties_%s"%c
 
 # The demand minimum constraints are added to prob for each demand node (bar)
 for f in Facilities:
@@ -203,9 +210,9 @@ for v in prob.variables():
 print("Total Cost of Transportation = ", value(prob.objective))
 
 
-# In[276]:
+# In[19]:
 
-# print(value(prob.objective)/1000)
+print(value(prob.objective)/10000000)
 
 
 # In[ ]:
@@ -213,7 +220,7 @@ print("Total Cost of Transportation = ", value(prob.objective))
 
 
 
-# In[289]:
+# In[20]:
 
 # """
 # The American Steel Problem for the PuLP Modeller

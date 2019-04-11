@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
 # Script to clean capacity values of SWIS compost sites and make spatial
 
 # First, load packages
@@ -18,8 +13,6 @@ from geopandas import GeoSeries, GeoDataFrame
 # only for jupyter nb to show plots inline
 #%matplotlib inline 
 
-
-# In[2]:
 
 #check wd
 #print(os.getcwd())
@@ -38,26 +31,11 @@ os.chdir("/Users/anayahall/projects/grapevine")
 #read in compost facilities csv
 df = pd.read_csv("data/interim/swis_compost.csv")
 
-
-# In[3]:
-
-df.columns
-df.head()
-#df.tail()
-#df.info()
-
-
-# In[17]:
-
 df.County.value_counts(dropna=False).head()
 
 
-# In[18]:
-
 df['CapacityUnits'].value_counts(dropna=False)
 
-
-# In[19]:
 
 # Identify and recode oddly labeled capacity units (those lacking time unit)
 # first: Tons
@@ -72,12 +50,7 @@ for i in range(n):
         df.at[i, 'CapacityUnits'] = "Tons/year"
     if df.SwisNo[i]=="36-AA-0456": 
         df.at[i, 'CapacityUnits'] = "Tons/year"
-        
-# foo = df[df.CapacityUnits=="Tons/Year"]
-# print('foo', foo)
 
-
-# In[20]:
 
 #df[df.CapacityUnits=="Cubic Yards"]
 
@@ -105,8 +78,6 @@ for i in range(n):
 df[df.CapacityUnits=="Cubic Yards"]
 
 
-# In[21]:
-
 # first filter out all th
 df = df[df['Capacity'].notnull()]
 
@@ -114,12 +85,6 @@ df.reset_index(inplace=True)
 
 df['cap_m3'] = 0.0
 
-# print("df index length: ", len(df.index))
-
-df.tail()
-
-
-# In[22]:
 
 # write function to convert all capacity units into cubic meters/month!
 
@@ -165,28 +130,6 @@ for i in range(n):
 
 # will also need a function to convert waste volume into compost volume
 
-
-# In[23]:
-
-# Last thing is to make all points spatial
-# try using shapely package
-
-# point = Point(df.Longitude[0], df.Latitude[0])
-
-# df.points = {}
-
-# n = len(df.index)
-# for i in range(n):
-#     df.points[i] = Point(df.Longitude[i], df.Latitude[i])
-
-
-# In[24]:
-
-df.head()
-
-
-# In[25]:
-
 # df.columns
 # m3 * yd3/m3 * tons/yd3
 #cap_m3 * (1/0.764555) * (1/2.24)
@@ -194,9 +137,7 @@ df.head()
 sum(df.cap_m3) * (1/0.764555) * (1/2.24)
 
 
-# In[26]:
-
-# Use geopandas instead
+# Use geopandas to make spatial
 # from: https://geohackweek.github.io/vector/04-geopandas-intro/
 geometry = [Point(xy) for xy in zip(df['Longitude'], df['Latitude'])]
 gdf = GeoDataFrame(df, geometry=geometry)
@@ -205,19 +146,19 @@ gdf = GeoDataFrame(df, geometry=geometry)
 len(geometry)
 
 
-# In[27]:
+# In[14]:
 
 gdf.plot(marker='*', color='green', markersize=50, figsize=(3, 3))
 
 
-# In[28]:
+# In[15]:
 
 df.head()
 
 
-# In[33]:
+# In[16]:
 
-gdf.crs = {'init' :'epsg:4326'}
+gdf.crs = {'init' :'epsg:3310'}
 
 
 # gdf.head()
@@ -231,7 +172,6 @@ gdf.to_file(driver='ESRI Shapefile', filename=out)
 print("DONE")
 
 
-# In[34]:
 
 
 
