@@ -2,15 +2,17 @@
 title: "compost distribution"
 author: "Anaya Hall"
 # date: "4/1/2019"
-# output: word_document
-output: pdf_document
-fontsize: 18 pt
-geometry: margin=.75in
+output: word_document
+# output: pdf_document
+# fontsize: 18 pt
+# geometry: margin=.75in
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+\newcommand{\sR}[1]{\in\mathbb{R}^{#1}}
 
 $i$ : Index of county ($1,...,n$)  
 $j$ : Index of facilities ($1,...,m$)  
@@ -37,6 +39,7 @@ $$O_j = c \cdot I_j$$
 Total compost applied in each county is the sum of the proporion of output from $f_j$ for $j = 1,...,m$  
 $$TC_i = \sum_{j=1}^{m} d_{ji} O_j$$  
 
+$$D\sR{n\times m}$$ cheese
 
 subject to: 
 
