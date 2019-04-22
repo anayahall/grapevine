@@ -24,6 +24,8 @@ from fxns import epsg_meters
 # # TECHNICAL inventory
 # tbm = pd.read_csv("data/raw/biomass.inventory.technical.csv")
 
-ej = gpd.read_file("data/calenviroscreen/CESJune2018Update_SHP/CES3June2018Update.shp")
+#ej = gpd.read_file("data/calenviroscreen/CESJune2018Update_SHP/CES3June2018Update.shp")
+CA = gpd.read_file("data/raw/CA_Counties_2/CA_Counties_TIGER2016.shp")
 
-ej.plot()
+
+

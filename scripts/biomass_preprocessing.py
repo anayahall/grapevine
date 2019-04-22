@@ -53,7 +53,6 @@ def MergeInventoryAndCounty(gross_inventory, technical_inventory, county_shapefi
 
 
     # CREATE FIPS ID to merge with county names
-    #CAshape.FIPS = str(CAshape.STATEFP) + str(CAshape.COUNTYFP)
     CA['FIPS']=CA['STATEFP'].astype(str)+CA['COUNTYFP']
 
     # get rid of leading zero
@@ -61,15 +60,15 @@ def MergeInventoryAndCounty(gross_inventory, technical_inventory, county_shapefi
 
     #convert to integer for merging below
     CA.FIPS = [int(i) for i in CA.FIPS]
-    print(CA.head())
+    #print(CA.head())
 
 
     # NEED TO BRING IN COUNTY NAMES TO MERGE WITH BIOMASS DATA
     countyIDs = pd.read_csv(fips_data, names = ["FIPS", "COUNTY", "State"])
-    print(countyIDs)
+    #print(countyIDs)
 
-    print(type(countyIDs.FIPS[0]))
-    print(type(CA.FIPS[0]))
+    #print(type(countyIDs.FIPS[0]))
+    #print(type(CA.FIPS[0]))
 
     CAshape = pd.merge(CA, countyIDs, on = 'FIPS')
 
@@ -81,7 +80,7 @@ def MergeInventoryAndCounty(gross_inventory, technical_inventory, county_shapefi
     CA_pts = CAshape.set_geometry('cocent')[['cocent','FIPS', 'COUNTY', 'ALAND', 'AWATER']]
 
     # now can merge with biomass data finally!!!
-    print(gbm.columns)
+    #print(gbm.columns)
     print("merging biomass data with CA shapefile")
 
     #POLYGONS
