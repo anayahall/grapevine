@@ -209,7 +209,7 @@ for facility in facilities['SwisNo']:
 	for rangeland in rangelands['OBJECTID']:
 		x = f2r[facility][rangeland]
 		temp_out += x['quantity']
-	cons += [temp_in == waste_to_compost*temp_out]
+	cons += [temp_out == waste_to_compost*temp_in]
 
 
 prob = cp.Problem(cp.Minimize(obj), cons)
