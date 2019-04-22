@@ -1,3 +1,5 @@
+## testOP.py
+
 import cvxpy as cp
 import numpy as np
 import os
@@ -97,11 +99,11 @@ rangelands['centroid'] = rangelands['geometry'].centroid
 #Variables
 # constants
 landfill_ef = 1 #TODO
-compost_ef = 0.5
+compost_ef = 0.2
 kilometres_to_emissions = 1
 spreader_ef = 1
 seq_f = -40
-conversion = 0.58
+waste_to_compost = 0.58
 
 # decision variables
 # proportion of county waste to send to a facility 
@@ -112,7 +114,7 @@ for county in counties['COUNTY']:
     for facility in facilities['SwisNo']:
         floc = Fetch(facilities, 'SwisNo', facility, 'geometry')
         c2f[county][facility] = {}
-        c2f[county][facility]['prop'] = cp.Variable()
+        c2f[county][facility]['quantity'] = cp.Variable()
         c2f[county][facility]['trans_cost'] = Distance(cloc,floc)*kilometres_to_emissions
 
 # proportion of compost to send to rangeland 
@@ -123,16 +125,8 @@ for facility in facilities['SwisNo']:
     for rangeland in rangelands['OBJECTID']:
         rloc = Fetch(rangelands, 'OBJECTID', rangeland, 'centroid')
         f2r[facility][rangeland] = {}
-        f2r[facility][rangeland]['prop'] = cp.Variable()
+        f2r[facility][rangeland]['quantity'] = cp.Variable()
         f2r[facility][rangeland]['trans_cost'] = Distance(floc,rloc)*kilometres_to_emissions
-
-# intake of facility - sum of material a facility recieves 
-intake = {}
-for facility in facilities['SwisNo']:
-    intake[facility] = cp.Variable()
-
-
-
 
 
 #BUILD OBJECTIVE FUNCTION: we want to minimize emissions
@@ -143,29 +137,29 @@ for county in counties['COUNTY']:
     temp = 0
     for facility in facilities['SwisNo']:
         x    = c2f[county][facility]
-        temp += x['prop']
+        temp += x['quantity']
 #    temp = sum([c2f[county][facility]['prop'] for facilities in facilities['SwisNo']]) #Does the same thing
-    obj += landfill_ef*(1 - temp)*Fetch(counties, 'COUNTY', county, 'disposal.y')
+    obj += landfill_ef*(1 - temp)
 
 # emissions due to transport of waste from county to facility
 for county in counties['COUNTY']:
     for facility in facilities['SwisNo']:
         x    = c2f[county][facility]
-        obj += x['prop']*x['trans_cost']*Fetch(counties, 'COUNTY', county, 'disposal.y')
+        obj += x['quantity']*x['trans_cost']
 
 # emissions due to waste remaining in facility #TODO - hyperbolic constraint!
 for facility in facilities['SwisNo']:
     temp = 0
     for rangeland in rangelands['OBJECTID']:
         x = f2r[facility][rangeland]
-        temp += x['prop']
-    obj += compost_ef*(1 - temp)*conversion*intake[facility]    
+        temp += x['quantity']
+    obj += compost_ef*(1 - temp)    
     #TODO - change capacity units
 
 for facility in facilities['SwisNo']:
     for rangeland in rangelands['OBJECTID']:
         x = f2r[facility][rangeland]
-        applied_amount = x['prop']*conversion*intake[facility]
+        applied_amount = x['quantity']
         # emissions due to transport of compost from facility to rangelands
         obj += x['trans_cost']* applied_amount
         # emissions due to application of compost by manure spreader
@@ -182,40 +176,51 @@ for county in counties['COUNTY']:
     temp = 0
     for facility in facilities['SwisNo']:
         x    = c2f[county][facility]
-        temp += x['prop']
-        cons += [0<=x['prop']]              #Each proportion must be >=0
-    cons += [temp <= 1]                     #Sum of propotions for each county must be <=1
+        temp += x['quantity']
+        cons += [0<=x['quantity']]              #Quantity must be >=0
+    cons += [temp <= Fetch(counties, 'COUNTY', county, 'disposal.y')]   #Sum for each county must be <= county production
 
-#
+# demand constraints
 for facility in facilities['SwisNo']:
     temp = 0
     for rangeland in rangelands['OBJECTID']:
         x = f2r[facility][rangeland]
-        temp += x['prop']
-        cons += [0<=x['prop']]              #Each proportion must be >=0
-    cons += [temp <= 1]  
+        temp += x['quantity']
+        cons += [0<=x['quantity']]              #Each proportion must be >=0
+    cons += [temp <= Fetch(facilities, 'SwisNo', facility, 'cap_m3')]  # sum of each facility must be less than capacity
 
-# capacity constraint
-for facility in facilities['SwisNo']:
-    cons += [intake[facility] <= Fetch(facilities, 'SwisNo', facility, 'cap_m3')]
 
-# intake constraint
+#intake constraint
+# for facility in facilities['SwisNo']:
+#     temp = 0
+#     for county in counties['COUNTY']:
+#         x    = c2f[county][facility]
+#         temp += x['quantity']             #Each proportion must be >=0
+#     cons += [temp <= Fetch(counties, 'COUNTY', county, 'disposal.y')] 
+
+
+# facility intake to facility output
 for facility in facilities['SwisNo']:
-    temp = 0
-    for county in counties['COUNTY']:
-        x    = c2f[county][facility]
-        temp += x['prop']*Fetch(counties, 'COUNTY', county, 'disposal.y')             #Each proportion must be >=0
-    cons += [temp == intake[facility]]         
+	temp_in = 0
+	temp_out = 0
+	for county in counties['COUNTY']:
+		x = c2f[county][facility]
+		temp_in += x['quantity']
+	for rangeland in rangelands['OBJECTID']:
+		x = f2r[facility][rangeland]
+		temp_out += x['quantity']
+	cons += [temp_in == waste_to_compost*temp_out]
+
 
 prob = cp.Problem(cp.Minimize(obj), cons)
-val = prob.solve(gp=True)
+val = prob.solve(gp=False)
 print("Optimal object value = {0}".format(val))
 
 
 print("{0:15} {1:15} {2:15}".format("County","Facility","Amount"))
 for county in counties['COUNTY']:
     for facility in facilities['SwisNo']:
-        print("{0:15} {1:15} {2:15}".format(county,facility,c2f[county][facility]['prop'].value))
+        print("{0:15} {1:15} {2:15}".format(county,facility,c2f[county][facility]['quantity'].value))
 
 # print("{0:15} {1:15}".format("Rangeland","Amount"))
 # for facility in facilities['SwisNo']:
