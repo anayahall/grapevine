@@ -232,7 +232,6 @@ for facility in facilities['SwisNo']:
 
 
 
-
 # #ALTERNATE OBJECTIVE FUNCTION IS TO MINIMIZE COST 
 # obj_cost = 0
 
