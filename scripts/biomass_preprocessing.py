@@ -88,6 +88,20 @@ def MergeInventoryAndCounty(gross_inventory, technical_inventory, county_shapefi
     # # Do same for technical biomass
     # tbm_shp = pd.merge(CAshape, tbm, on = 'COUNTY')
 
+    # TODO - turn into wet tons
+    # fw_mc = 0.7
+    # gw_mc = 0.5
+
+    # fw = ofmsw[ofmsw['Feedstock'] == "FOOD"]
+    # gw = ofmsw[ofmsw['Feedstock'] == "GREEN"]
+
+    # fw['WetTons'] = fw['BDTons'] * (1 + fw_mc)
+    # gw['WetTons'] = gw['BDTons'] * (1 + gw_mc)
+
+
+    # TODO - turn into m3
+
+
     # COUNTY CENTROIDS
     gbm_pts = pd.merge(CA_pts, gbm, on = 'COUNTY')
     tbm_pts = pd.merge(CA_pts, tbm, on = 'COUNTY')

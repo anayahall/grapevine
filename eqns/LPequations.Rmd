@@ -2,10 +2,10 @@
 title: "compost distribution"
 author: "Anaya Hall"
 # date: "4/1/2019"
-output: word_document
-# output: pdf_document
+# output: word_document
+output: pdf_document
 # fontsize: 18 pt
-# geometry: margin=.75in
+geometry: margin=.75in
 ---
 
 ```{r setup, include=FALSE}
@@ -21,8 +21,9 @@ $$gCO_2e =
 \underbrace{\sum_{i=1}^{n} \sum_{j=1}^{m} h \cdot D_{ij} s_{ij} W_i}_{\text{transport from county to facility}} + 
 \underbrace{\sum_{i=1}^{n} (1-\sum_{j=1}^{m}s_{ij})W_i\cdot f}_{\text{waste that remains in county}} +  
 \underbrace{\sum_{i=1}^{n} \sum_{j=1}^{m} h \cdot L_{ji}d_{ji} TC_i}_{\text{transport from facility to land}} + 
-\underbrace{\sum_{j=1}^{m}(1-\sum_{i=1}^{n}d_{ij})TC_i\cdot g}_{\text{compost that remains in facililty}} + 
-\underbrace{XXX}_{\text{soil emissions???}} + 
+\underbrace{\sum_{j=1}^{m}(1-\sum_{i=1}^{n}d_{ij})TC_i\cdot g}_{\text{compost that remains in facililty}} + $$  
+
+$$ \underbrace{XXX}_{\text{soil emissions???}} + 
 \underbrace{\sum_{j=1}^m p \cdot s_{ij} W_i}_{\text{spreading compost}}
 $$
 

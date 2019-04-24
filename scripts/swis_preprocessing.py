@@ -3,19 +3,11 @@
 # First, load packages
 import pandas as pd
 import os
-import numpy as np
 import shapely as sp
 from shapely.geometry import Point
-
-import matplotlib.pyplot as plt
 import geopandas as gpd
 from geopandas import GeoSeries, GeoDataFrame
-# only for jupyter nb to show plots inline
-#%matplotlib inline 
-
-
-#check wd
-#print(os.getcwd())
+ 
 
 #change wd
 os.chdir("/Users/anayahall/projects/grapevine")
@@ -148,7 +140,7 @@ len(geometry)
 
 # In[14]:
 
-gdf.plot(marker='*', color='green', markersize=50, figsize=(3, 3))
+# gdf.plot(marker='*', color='green', markersize=50, figsize=(3, 3))
 
 
 # In[15]:

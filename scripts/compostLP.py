@@ -75,7 +75,7 @@ counties = counties[['FIPS', 'COUNTY', 'disposal.y', 'geometry']]
 counties = counties[(counties['COUNTY'] == "Los Angeles") | (counties['COUNTY'] == "San Diego")| (counties['COUNTY'] == "Orange")| (counties['COUNTY'] == "Imperial")]
 
 ####MAKE DICTIONARY HERE
-cdict = dict(zip(counties['COUNTY'], counties['disposal.y']))
+# cdict = dict(zip(counties['COUNTY'], counties['disposal.y']))
 
 # Mini gdfs of facilites (location and capacity)
 facilities = gpd.read_file(opj(DATA_DIR, "clean/clean_swis.shp"))
@@ -115,7 +115,7 @@ kilometres_to_emissions = 0.37 # kg CO2e/ m3 - km for 35mph speed
 kilometres_to_emissions_10 = 1 # TODO
 spreader_ef = 1.854 # kg CO2e / m3
 seq_f = -108 # kg CO2e / m3
-waste_to_compost = 0.58 #%
+waste_to_compost = 0.58 #% volume change from waste to compost
 c2f_trans_cost = .206 #$/m3-km
 f2r_trans_cost = .206 #$/m3-km
 spreader_cost = 1 #TODO
@@ -186,10 +186,9 @@ for facility in facilities['SwisNo']:
         # emissions due to sequestration of applied compost
         obj += seq_f * applied_amount
 
+
 #Constraints
 cons = []
-
-
 
 #supply constraint
 for county in counties['COUNTY']:
@@ -228,7 +227,8 @@ for facility in facilities['SwisNo']:
 	for rangeland in rangelands['OBJECTID']:
 		x = f2r[facility][rangeland]
 		temp_out += x['quantity']
-	cons += [temp_out == waste_to_compost*temp_in]
+	cons += [temp_out <= waste_to_compost*temp_in]
+
 
 
 
@@ -265,7 +265,7 @@ for county in counties['COUNTY']:
 # print("{0:15} {1:15}".format("Rangeland","Amount"))
 # for facility in facilities['SwisNo']:
 #     for rangeland in rangelands['OBJECTID']:
-#         print("{0:15} {1:15} {2:15}".format(facility,rangeland,f2r[facility][rangeland]['prop'].value))
+#         print("{0:15} {1:15} {2:15}".format(facility,rangeland,f2r[facility][rangeland]['quantity'].value))
 
 
 #Calculate cost after solving!
@@ -293,6 +293,19 @@ print("COST ($) : ", cost)
 result = cost/val
 
 print("$/CO2e MITIGATED: ", -result)
+
+# other results I might want:
+# area covered (ha) - applied amount back into ha
+
+# tons applied (applied amount)
+
+# applied amount by county?
+
+# scenario runs
+
+
+
+
 
 
 
