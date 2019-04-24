@@ -91,18 +91,17 @@ facilities = facilities[0:5]
 
 # Import rangelands
 rangelands = gpd.read_file(opj(DATA_DIR, "raw/CA_FMMP_G/gl_bycounty/grazingland_county.shp"))
-rangelands = rangelands.to_crs(epsg=4326)
+rangelands = rangelands.to_crs(epsg=4326) # make sure this is read in degrees (WGS84)
 
 
-# get area in kilometers
-# rangelands["area_km"] = rangelands['geometry'].area/ 10**6
-rangelands['area_ha'] = rangelands['Shape_Area']/10000
-rangelands['capacity_m3'] = rangelands['area_ha'] * 63.5
-rangelands['capacity_ton'] = rangelands['area_ha'] * 37.1
+# convert area capacity into volume capacity
+rangelands['area_ha'] = rangelands['Shape_Area']/10000 # convert area in m2 to hectares
+rangelands['capacity_m3'] = rangelands['area_ha'] * 63.5 # use this metric for m3 unit framework
+# rangelands['capacity_ton'] = rangelands['area_ha'] * 37.1 # also calculated for tons unit framework
 
 
 # estimate centroid
-rangelands['centroid'] = rangelands['geometry'].centroid
+rangelands['centroid'] = rangelands['geometry'].centroid 
 
 
 # OPTIMIZATION #################################
@@ -165,14 +164,14 @@ for county in counties['COUNTY']:
         x    = c2f[county][facility]
         obj += x['quantity']*x['trans_emis']
 
-# emissions due to waste remaining in facility #TODO - hyperbolic constraint!
+# emissions due to waste remaining in facility
 for facility in facilities['SwisNo']:
     temp = 0
     for rangeland in rangelands['OBJECTID']:
         x = f2r[facility][rangeland]
         temp += x['quantity']
     obj += compost_ef*(1 - temp)    
-    #TODO - change capacity units
+
 
 for facility in facilities['SwisNo']:
     for rangeland in rangelands['OBJECTID']:
@@ -209,25 +208,27 @@ for facility in facilities['SwisNo']:
         cons += [0 <= x['quantity']]              #Each quantity must be >=0
     cons += [temp <= Fetch(facilities, 'SwisNo', facility, 'cap_m3')]  # sum of each facility must be less than capacity
 
+# end-use  constraint capacity
 for rangeland in rangelands['OBJECTID']:
 	temp = 0
 	for facility in facilities['SwisNo']:
 		x = f2r[facility][rangeland]
 		temp += x['quantity']
 		cons += [0<=x['quantity']]				# value must be >=0
+	# rangeland capacity constraint (no more can be applied than 0.25 inches per m2)
 	cons += [temp <= Fetch(rangelands, 'OBJECTID', rangeland, 'capacity_m3')]
 
-# facility intake to facility output
+# balance facility intake to facility output
 for facility in facilities['SwisNo']:
 	temp_in = 0
 	temp_out = 0
 	for county in counties['COUNTY']:
 		x = c2f[county][facility]
-		temp_in += x['quantity']
+		temp_in += x['quantity']	# sum of intake into facility from counties
 	for rangeland in rangelands['OBJECTID']:
 		x = f2r[facility][rangeland]
-		temp_out += x['quantity']
-	cons += [temp_out <= waste_to_compost*temp_in]
+		temp_out += x['quantity']	# sum of output from facilty to rangeland
+	cons += [temp_out == waste_to_compost*temp_in]
 
 
 
